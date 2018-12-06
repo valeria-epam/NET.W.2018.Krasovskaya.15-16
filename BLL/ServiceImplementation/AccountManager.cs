@@ -37,6 +37,7 @@ namespace BLL.ServiceImplementation
             if (!hasAccount)
             {
                 _storage.AddAccount(Mappers.Mapper.MapAccountToDTO(account));
+                _storage.Save();
             }
             else
             {
@@ -54,6 +55,7 @@ namespace BLL.ServiceImplementation
             if (bankAccount != null)
             {
                 bankAccount.State = AccountStateDTO.Closed;
+                _storage.Save();
             }
             else
             {
@@ -88,6 +90,7 @@ namespace BLL.ServiceImplementation
             bankAccount.Bonus += _calculateBonus.RefillBonus(Mappers.Mapper.MapAccount(bankAccount), amountOfMoney);
             account.Sum = bankAccount.Sum;
             account.Bonus = bankAccount.Bonus;
+            _storage.Save();
         }
 
         /// <summary>
@@ -127,6 +130,7 @@ namespace BLL.ServiceImplementation
 
             account.Sum = bankAccount.Sum;
             account.Bonus = bankAccount.Bonus;
+            _storage.Save();
         }
 
         /// <summary>

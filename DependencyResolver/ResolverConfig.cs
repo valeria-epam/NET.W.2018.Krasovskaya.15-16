@@ -2,7 +2,7 @@
 using System.Reflection;
 using BLL.Interface.Interfaces;
 using BLL.ServiceImplementation;
-using DAL.Fake.Repositories;
+using DAL;
 using DAL.Interface.Interfaces;
 using Ninject;
 
@@ -17,7 +17,8 @@ namespace DependencyResolver
             Directory.CreateDirectory(storageFolder);
             var path = Path.Combine(storageFolder, "BankAccountStorage");
 
-            kernel.Bind<IAccountStorage>().To<AccountStorage>().WithConstructorArgument(path);
+            // kernel.Bind<IAccountStorage>().To<AccountStorage>().WithConstructorArgument(path);
+            kernel.Bind<IAccountStorage>().To<AccountStorage>();
             kernel.Bind<IAccountManager>().To<AccountManager>();
             kernel.Bind<ICalculateBonus>().To<CalculateBonus>().InSingletonScope();
             kernel.Bind<IGenerateNumber>().To<GenerateNumber>().InSingletonScope();
