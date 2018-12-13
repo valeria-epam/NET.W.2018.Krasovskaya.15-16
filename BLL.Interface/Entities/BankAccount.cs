@@ -9,6 +9,8 @@ namespace BLL.Interface.Entities
     {
         public string Number { get; set; }
 
+        public string Email { get; set; }
+
         public AccountOwner Owner { get; set; }
 
         public decimal Sum { get; set; }

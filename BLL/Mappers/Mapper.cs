@@ -33,5 +33,11 @@ namespace BLL.Mappers
                 .ForMember(x => x.State, s => s.MapFrom(t => t.State))).CreateMapper();
             return mapper.Map<BankAccount, BankAccountDTO>(account);
         }
+
+        public static IEnumerable<AccountType> MapTypes(IEnumerable<AccountTypeDTO> typeDtos)
+        {
+            var mapper = new MapperConfiguration(c => c.CreateMap<AccountTypeDTO, AccountType>()).CreateMapper();
+            return mapper.Map<IEnumerable<AccountTypeDTO>, IEnumerable<AccountType>>(typeDtos);
+        }
     }
 }

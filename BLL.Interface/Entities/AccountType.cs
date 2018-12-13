@@ -1,4 +1,6 @@
-﻿namespace BLL.Interface.Entities
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace BLL.Interface.Entities
 {
     /// <summary>
     /// Represents account type.
@@ -20,6 +22,7 @@
         /// </summary>
         public static AccountType PlatinumAccount { get; } = new AccountType() { TypeName = "Platinum", BalanceCost = 15, RefillCost = 10 };
 
+        [Display(Name = "Account type")]
         public string TypeName { get; set; }
 
         public int BalanceCost { get; set; }

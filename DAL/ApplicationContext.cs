@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using DAL.Interface.DTO;
 
 namespace DAL
@@ -16,10 +11,14 @@ namespace DAL
             Database.SetInitializer<ApplicationContext>(new AppDbInitializer());
         }
 
-        public ApplicationContext() : base("DbConnection") { }
+        public ApplicationContext() : base("DbConnection")
+        {
+        }
 
         public DbSet<AccountOwnerDTO> AccountOwners { get; set; }
+
         public DbSet<AccountTypeDTO> AccountTypes { get; set; }
+
         public DbSet<BankAccountDTO> BankAccounts { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
@@ -38,8 +37,17 @@ namespace DAL
             modelBuilder.Entity<AccountTypeDTO>().HasKey(x => x.TypeName);
         }
 
-        public class AppDbInitializer : DropCreateDatabaseAlways<ApplicationContext>
+        public class AppDbInitializer : CreateDatabaseIfNotExists<ApplicationContext>
         {
+            protected override void Seed(ApplicationContext context)
+            {
+                var baseType = new AccountTypeDTO() { TypeName = "Base", BalanceCost = 5, RefillCost = 3 };
+                var goldType = new AccountTypeDTO() { TypeName = "Gold", BalanceCost = 10, RefillCost = 5 };
+                var platinumType = new AccountTypeDTO() { TypeName = "Platinum", BalanceCost = 15, RefillCost = 10 };
+                context.AccountTypes.AddRange(new[] { baseType, platinumType, goldType });
+
+                base.Seed(context);
+            }
         }
     }
 }

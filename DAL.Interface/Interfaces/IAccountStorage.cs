@@ -34,6 +34,11 @@ namespace DAL.Interface.Interfaces
         IEnumerable<BankAccountDTO> GetAccounts();
 
         /// <summary>
+        /// Gets all account types.
+        /// </summary>
+        IEnumerable<AccountTypeDTO> GetAccountTypes();
+
+        /// <summary>
         /// Saves the accounts to the storage.
         /// </summary>
         void Save();

@@ -75,6 +75,11 @@ namespace DAL.Fake.Repositories
             return Accounts;
         }
 
+        public IEnumerable<AccountTypeDTO> GetAccountTypes()
+        {
+            throw new System.NotImplementedException();
+        }
+
         /// <summary>
         /// Saves the accounts to the storage.
         /// </summary>

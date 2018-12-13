@@ -1,0 +1,64 @@
+﻿@model IEnumerable<BLL.Interface.Entities.BankAccount>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Bank Accounts</h2>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Email)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Owner.Name)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Owner.Surname)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Sum)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Bonus)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.AccountType.TypeName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.State)
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Email)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Owner.Name)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Owner.Surname)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Sum)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Bonus)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.AccountType.TypeName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.State)
+        </td>
+        <th>
+            @Html.ActionLink("Close Bank Account", "Close", new { id = item.Number })
+        </th>
+    </tr>
+    }
+
+</table>

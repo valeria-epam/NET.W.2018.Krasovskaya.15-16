@@ -15,15 +15,17 @@ namespace BLL.ServiceImplementation
         private readonly ICalculateBonus _calculateBonus;
         private readonly IAccountStorage _storage;
         private readonly IGenerateNumber _generateNumber;
+        private readonly INotificationService _service;
 
         /// <summary>
         /// Initializes a new instance of <see cref="AccountManager"/>. 
         /// </summary>
-        public AccountManager(ICalculateBonus calculateBonus, IAccountStorage storage, IGenerateNumber generateNumber)
+        public AccountManager(ICalculateBonus calculateBonus, IAccountStorage storage, IGenerateNumber generateNumber, INotificationService service)
         {
             _calculateBonus = calculateBonus;
             _storage = storage;
             _generateNumber = generateNumber;
+            _service = service;
         }
 
         /// <summary>
@@ -43,6 +45,58 @@ namespace BLL.ServiceImplementation
             {
                 throw new Exception("Our storage already has this account.");
             }
+        }
+
+        /// <summary>
+        /// Transfers amount of money from one account to another account.
+        /// </summary>
+        public void Transfer(BankAccount accountFrom, BankAccount accountTo, decimal amountOfMoney)
+        {
+            if (amountOfMoney <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(amountOfMoney));
+            }
+
+            CheckAccount(accountFrom);
+            CheckAccount(accountTo);
+
+            var bankAccountFrom = _storage.GetAccount(accountFrom.Number);
+            var bankAccountTo = _storage.GetAccount(accountTo.Number);
+            if (bankAccountFrom == null || bankAccountTo == null)
+            {
+                throw new Exception("Our storage doesn't have this account.");
+            }
+
+            if (bankAccountFrom.State == AccountStateDTO.Closed || bankAccountTo.State == AccountStateDTO.Closed)
+            {
+                throw new Exception("Your account is closed.");
+            }
+
+            if (bankAccountFrom.Sum < amountOfMoney)
+            {
+                throw new Exception("You don't have enough money on your account.");
+            }
+
+            bankAccountFrom.Sum -= amountOfMoney;
+            bankAccountTo.Sum += amountOfMoney;
+            var bonusCountFrom = _calculateBonus.RefillBonus(Mappers.Mapper.MapAccount(bankAccountFrom), amountOfMoney);
+            bankAccountFrom.Bonus -= bonusCountFrom;
+            if (bankAccountFrom.Bonus < 0m)
+            {
+                bankAccountFrom.Bonus = 0m;
+            }
+
+            var bonusCountTo = _calculateBonus.RefillBonus(Mappers.Mapper.MapAccount(bankAccountTo), amountOfMoney);
+            bankAccountTo.Bonus += bonusCountTo;
+            accountFrom.Sum = bankAccountFrom.Sum;
+            accountTo.Sum = bankAccountTo.Sum;
+            accountFrom.Bonus = bankAccountFrom.Bonus;
+            accountTo.Bonus = bankAccountTo.Bonus;
+            _storage.Save();
+            string bodyTo = $"{amountOfMoney} credited to your account. Accrued {bonusCountTo} bonus points.";
+            string bodyFrom = $"{amountOfMoney} withdrawn from your account. {bonusCountFrom} bonus points shot.";
+            _service.Send(accountTo.Email, bodyTo);
+            _service.Send(accountFrom.Email, bodyFrom);
         }
 
         /// <summary>
@@ -87,10 +141,13 @@ namespace BLL.ServiceImplementation
             }
 
             bankAccount.Sum += amountOfMoney;
-            bankAccount.Bonus += _calculateBonus.RefillBonus(Mappers.Mapper.MapAccount(bankAccount), amountOfMoney);
+            var bonusCount = _calculateBonus.RefillBonus(Mappers.Mapper.MapAccount(bankAccount), amountOfMoney);
+            bankAccount.Bonus += bonusCount;
             account.Sum = bankAccount.Sum;
             account.Bonus = bankAccount.Bonus;
             _storage.Save();
+            string body = $"{amountOfMoney} credited to your account. Accrued {bonusCount} bonus points.";
+            _service.Send(account.Email, body);
         }
 
         /// <summary>
@@ -122,7 +179,8 @@ namespace BLL.ServiceImplementation
             }
 
             bankAccount.Sum -= amountOfMoney;
-            bankAccount.Bonus -= _calculateBonus.WithdrawalBonus(Mappers.Mapper.MapAccount(bankAccount), amountOfMoney);
+            var bonusCount = _calculateBonus.WithdrawalBonus(Mappers.Mapper.MapAccount(bankAccount), amountOfMoney);
+            bankAccount.Bonus -= bonusCount;
             if (bankAccount.Bonus < 0m)
             {
                 bankAccount.Bonus = 0m;
@@ -131,6 +189,8 @@ namespace BLL.ServiceImplementation
             account.Sum = bankAccount.Sum;
             account.Bonus = bankAccount.Bonus;
             _storage.Save();
+            string body = $"{amountOfMoney} withdrawn from your account. {bonusCount} bonus points shot.";
+            _service.Send(account.Email, body);
         }
 
         /// <summary>

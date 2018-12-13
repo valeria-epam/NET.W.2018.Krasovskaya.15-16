@@ -14,8 +14,14 @@ namespace BLL.Interface.Interfaces
         void AddBankAccount(BankAccount account);
 
         /// <summary>
+        /// Transfers amount of money from one account to another account.
+        /// </summary>
+        void Transfer(BankAccount accountFrom, BankAccount accountTo, decimal amountOfMoney);
+
+        /// <summary>
         /// Close account if it exists.
         /// </summary>
+        /// <param name="account">The account.</param>
         void CloseBankAccount(BankAccount account);
 
         /// <summary>

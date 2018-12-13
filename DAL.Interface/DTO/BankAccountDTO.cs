@@ -9,6 +9,8 @@ namespace DAL.Interface.DTO
     {
         public string Number { get; set; }
 
+        public string Email { get; set; }
+
         public AccountOwnerDTO Owner { get; set; }
 
         public decimal Sum { get; set; }
